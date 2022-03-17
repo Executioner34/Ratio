@@ -4,7 +4,7 @@ import { getRandomPosition } from '../functions/getRandomPosition';
 import { getRandomValue } from '../functions/getRandomValue';
 import { createMatrix } from '../functions/createMatrix';
 import { Tile } from './Tile';
-import MakeObservableSubject from './Observer'
+import MakeObservableSubject from './Observer';
 
 class Board implements BoardInterface {
 	size!: number;
@@ -14,7 +14,9 @@ class Board implements BoardInterface {
 	Tile!: Tile;
 	subject!: MakeObservableSubject;
 	counterTiles: number;
-	total: number
+	total: number;
+	quantityTiles: number;
+	isEndGame: boolean
 
 	constructor(parent: HTMLDivElement, size: number, positionData: { top: number; left: number }[]) {
 		this.size = size;
@@ -22,7 +24,9 @@ class Board implements BoardInterface {
 		this.positionData = positionData;
 		this.matrix = createMatrix(size);
 		this.total = 0;
-		this.subject = new MakeObservableSubject()
+		this.quantityTiles = 0;
+		this.isEndGame = false;
+		this.subject = new MakeObservableSubject();
 		this.init(parent);
 	}
 
@@ -32,7 +36,7 @@ class Board implements BoardInterface {
 		this.createRandomTile();
 		this.arrowMove = this.arrowMove.bind(this);
 		document.addEventListener('keydown', this.arrowMove);
-		this.updateScores()
+		this.updateScores();
 	}
 
 	private createBoard(parent: HTMLDivElement) {
@@ -48,7 +52,7 @@ class Board implements BoardInterface {
 		const randomPositionOnRow = getRandomPosition(this.size);
 		const randomPositionOnColumn = getRandomPosition(this.size);
 		const randomPositionInData = randomPositionOnRow * this.size - this.size + (randomPositionOnColumn - 1);
-		if (this.matrix[randomPositionOnRow - 1][randomPositionOnColumn - 1] === undefined) {
+		if (!this.matrix[randomPositionOnRow - 1][randomPositionOnColumn - 1]) {
 			this.matrix[randomPositionOnRow - 1][randomPositionOnColumn - 1] = {
 				id: this.counterTiles,
 				value: randomValue,
@@ -61,45 +65,42 @@ class Board implements BoardInterface {
 				}),
 			};
 			this.counterTiles = this.counterTiles + 1;
+		} else if(this.quantityTiles === this.matrix.length) {
+			this.isEndGame = true;
+			this.subject.notify()
 		} else {
 			this.createRandomTile();
 		}
 	}
 
 	private arrowMove(e: KeyboardEvent) {
-		
 		switch (e.code) {
 			case 'ArrowDown':
 				e.preventDefault();
 				this.tilesMoveDown();
-				this.createRandomTile();
 				this.createRandomTile();
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
 				this.tilesMoveUp();
 				this.createRandomTile();
-				this.createRandomTile();
 				break;
 			case 'ArrowLeft':
 				e.preventDefault();
 				this.tilesMoveLeft();
-				this.createRandomTile();
 				this.createRandomTile();
 				break;
 			case 'ArrowRight':
 				e.preventDefault();
 				this.tilesMoveRight();
 				this.createRandomTile();
-				this.createRandomTile();
 				break;
 		}
-		this.updateScores()
+		this.updateScores();
 	}
 
 	private tilesMoveDown() {
 		for (let arr of this.matrix) {
-			let isMerge = false;
 			for (let j = arr.length - 1; j > 0; j--) {
 				for (let i = 0; i <= arr.length - 1; i++) {
 					if (this.matrix[j - 1][i] && this.matrix[j][i] === undefined) {
@@ -111,12 +112,13 @@ class Board implements BoardInterface {
 						this.matrix[j - 1][i] &&
 						this.matrix[j][i] &&
 						this.matrix[j - 1][i].value === this.matrix[j][i].value &&
-						isMerge === false
+						this.matrix[j - 1][i].tileElem.isMerge === false &&
+						this.matrix[j][i].tileElem.isMerge === false
 					) {
 						this.matrix[j][i].value = this.matrix[j][i].value + this.matrix[j - 1][i].value;
+						this.matrix[j][i].tileElem.isMerge = true;
 						this.matrix[j - 1][i].tileElem.destroy();
 						delete this.matrix[j - 1][i];
-						isMerge = true;
 					}
 				}
 			}
@@ -127,7 +129,6 @@ class Board implements BoardInterface {
 
 	private tilesMoveUp() {
 		for (let arr of this.matrix) {
-			let isMerge = false;
 			for (let j = 1; j <= arr.length - 1; j++) {
 				for (let i = 0; i <= arr.length - 1; i++) {
 					if (this.matrix[j][i] && this.matrix[j - 1][i] === undefined) {
@@ -139,23 +140,23 @@ class Board implements BoardInterface {
 						this.matrix[j - 1][i] &&
 						this.matrix[j][i] &&
 						this.matrix[j - 1][i].value === this.matrix[j][i].value &&
-						isMerge === false
+						this.matrix[j - 1][i].tileElem.isMerge === false &&
+						this.matrix[j][i].tileElem.isMerge === false
 					) {
 						this.matrix[j - 1][i].value = this.matrix[j][i].value + this.matrix[j - 1][i].value;
+						this.matrix[j - 1][i].tileElem.isMerge = true;
 						this.matrix[j][i].tileElem.destroy();
 						delete this.matrix[j][i];
-						isMerge = true;
 					}
 				}
 			}
 		}
-		this.updateTiles();
 		console.log(this.matrix);
+		this.updateTiles();
 	}
 
 	private tilesMoveLeft() {
 		this.matrix.forEach((arr, index) => {
-			let isMerge = false;
 			for (let j = 0; j <= arr.length - 1; j++) {
 				for (let i = 0; i <= arr.length - 1; i++) {
 					if (arr[i + 1] && arr[i] === undefined) {
@@ -163,34 +164,45 @@ class Board implements BoardInterface {
 						arr[i + 1] = arr[i];
 						swap.left = this.positionData[index * this.size + i].left;
 						arr[i] = swap;
-					} else if (arr[i] && arr[i + 1] && arr[i].value === arr[i + 1].value && isMerge === false) {
+					} else if (
+						arr[i] &&
+						arr[i + 1] &&
+						arr[i].value === arr[i + 1].value &&
+						arr[i].tileElem.isMerge === false &&
+						arr[i + 1].tileElem.isMerge === false
+					) {
 						arr[i].value = arr[i + 1].value + arr[i].value;
+						arr[i].tileElem.isMerge = true;
 						arr[i + 1].tileElem.destroy();
 						delete arr[i + 1];
-						isMerge = true;
 					}
 				}
 			}
 		});
-		this.updateTiles();
 		console.log(this.matrix);
+		this.updateTiles();
 	}
 
 	private tilesMoveRight() {
 		this.matrix.forEach((arr, index) => {
-			let isMerge = false;
-			for (let j = arr.length - 1; j >= 0; j--) {
-				for (let i = arr.length - 1; i >= 0; i--) {
+			for (let j = 0; j <= arr.length - 1; j++) {
+				for (let i = arr.length - 1; i >= 1 ; i--) {
 					if (arr[i - 1] && arr[i] === undefined) {
 						let swap = arr[i - 1];
 						arr[i - 1] = arr[i];
 						swap.left = this.positionData[index * this.size + i].left;
 						arr[i] = swap;
-					} else if (arr[i] && arr[i - 1] && arr[i].value === arr[i - 1].value && isMerge === false) {
+					} else if (
+						arr[i] &&
+						arr[i - 1] &&
+						arr[i].value === arr[i - 1].value &&
+						arr[i].tileElem.isMerge === false &&
+						arr[i - 1].tileElem.isMerge === false
+					) {
 						arr[i].value = arr[i - 1].value + arr[i].value;
+						arr[i].tileElem.isMerge = true;
 						arr[i - 1].tileElem.destroy();
 						delete arr[i - 1];
-						isMerge = true;
 					}
 				}
 			}
@@ -202,7 +214,7 @@ class Board implements BoardInterface {
 	private updateTiles() {
 		this.matrix.forEach((arr) => {
 			arr.map((tile) => {
-				if (tile !== undefined) {
+				if (tile) {
 					tile.tileElem.update(tile.value, tile.left, tile.top);
 				}
 			});
@@ -211,15 +223,18 @@ class Board implements BoardInterface {
 
 	public updateScores() {
 		let sum = 0;
+		let counter = 0;
 		this.matrix.forEach((arr) => {
 			arr.forEach((obj) => {
 				if (obj) {
+					counter = counter + 1;
 					sum = sum + obj.value;
 				}
 			});
 		});
 		this.total = sum;
-		this.subject.notify()
+		this.quantityTiles = counter;
+		this.subject.notify();
 	}
 }
 

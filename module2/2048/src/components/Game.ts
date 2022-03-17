@@ -10,6 +10,7 @@ class Game implements GameInterface {
 	best!: HTMLDivElement;
 	size!: number;
 	scores: number;
+	isEndGame: boolean;
 	options!: GameOptions;
 	Grid!: Grid;
 	Board!: Board;
@@ -19,6 +20,7 @@ class Game implements GameInterface {
 		this.root = options.root;
 		this.size = options.size || 5;
 		this.scores = 0;
+		this.isEndGame = false;
 		this.init();
 	}
 
@@ -29,6 +31,7 @@ class Game implements GameInterface {
 		this.Board = new Board(this.gameContainer, this.size, this.Grid.gridElementPositionData);
 		this.Board.subject.addObserver(() => {
 			this.scores = this.Board.total;
+			this.isEndGame = this.Board.isEndGame;
 			this.updateScoreContainer(this.Board.total)
 		})
 		this.updateScoreContainer(this.Board.total)

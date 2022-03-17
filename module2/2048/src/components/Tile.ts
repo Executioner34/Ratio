@@ -3,7 +3,7 @@ import { TileInterface } from "../types/globalInterfaces";
 import { createElement } from "../functions/createElement";
 
 class Tile implements TileInterface {
-	merge?: boolean | undefined;
+	isMerge?: boolean;
 	id: number;
 	position: { top: number; left: number };
 	value: number;
@@ -19,6 +19,7 @@ class Tile implements TileInterface {
 			left: number;
 		}
 	) {
+		this.isMerge = false
 		this.parent = parent
 		this.value = options.value;
 		this.id = options.id;
@@ -43,6 +44,7 @@ class Tile implements TileInterface {
 	}
 
 	public update = (value: number, left: number, top:number) => {
+		this.isMerge = false
 		this.value = value;
 		this.position = {
 			top: top,
