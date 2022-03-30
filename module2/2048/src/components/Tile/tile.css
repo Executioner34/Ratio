@@ -1,0 +1,137 @@
+.tile {
+  width: 86px;
+  height: 86px;
+  user-select: none;
+  text-align: center;
+  line-height: 100%;
+  font-size: 3.5rem;
+  border-radius: 3px;
+  z-index: 2;
+  position: absolute;
+  transition-property: left, top, transform;
+  transition-duration: 250ms, 250ms, 100ms;
+  transform: scale(1);
+  animation-duration: 0.5s;
+  animation-name: createtile;
+}
+
+@keyframes createtile {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tile-2 {
+  background-color: #eee4da;
+}
+
+.tile-4 {
+  background-color: #eee1c9;
+}
+
+.tile-8 {
+  color: #f9f6f2;
+  background: #f3b27a;
+}
+
+.tile-16 {
+  font-size: 3rem;
+  color: #f9f6f2;
+  background: #f69664;
+}
+
+.tile-32 {
+  font-size: 3rem;
+  color: #f9f6f2;
+  background: #f77c5f;
+}
+
+.tile-64 {
+  font-size: 3rem;
+  color: #f9f6f2;
+  background: #f75f3b;
+}
+
+.tile-128 {
+  font-size: 2.5rem;
+  color: #f9f6f2;
+  background: #edd073;
+  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.238095), inset 0 0 0 1px rgba(255, 255, 255, 0.142857);
+}
+
+.tile-256 {
+  font-size: 2.5rem;
+  color: #f9f6f2;
+  background: #edd073;
+  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.31746), inset 0 0 0 1px rgba(255, 255, 255, 0.190476);
+}
+
+.tile-512 {
+  color: #f9f6f2;
+  background: #edc53f;
+  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.39683), inset 0 0 0 1px rgba(255, 255, 255, 0.2381);
+  font-size: 2.5rem;
+}
+
+.tile-1024 {
+  color: #f9f6f2;
+  background: #edc850;
+  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.47619), inset 0 0 0 1px rgba(255, 255, 255, 0.28571);
+  font-size: 2rem
+}
+
+.tile-2048 {
+  color: #f9f6f2;
+  background: #edc22e;
+  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.55556), inset 0 0 0 1px rgba(255, 255, 255, 0.33333);
+  font-size: 2rem
+}
+
+@media screen 
+  and (max-device-width: 500px)
+  and (min-device-width: 400px) {
+    .tile {
+      font-size: 3rem;
+    }
+    .tile-16,
+    .tile-32,
+    .tile-64 {
+      font-size: 2.5rem;
+    }
+    .tile-128,
+    .tile-256,
+    .tile-512 {
+      font-size: 2rem;
+    }
+    .tile-1024,
+    .tile-2048 {
+      font-size: 1.5rem;
+    }
+  }
+
+@media screen 
+  and (max-device-width: 400px)
+  and (min-device-width: 320px) {
+    .tile {
+      font-size: 2.5rem;
+    }
+    .tile-16,
+    .tile-32,
+    .tile-64 {
+      font-size: 2rem;
+    }
+    .tile-128,
+    .tile-256,
+    .tile-512 {
+      font-size: 1.5rem;
+    }
+    .tile-1024,
+    .tile-2048 {
+      font-size: 1rem;
+    }
+  }

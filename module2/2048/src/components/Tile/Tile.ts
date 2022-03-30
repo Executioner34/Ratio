@@ -1,6 +1,7 @@
-import { TileInterface } from "../types/globalInterfaces";
+import './tile.css'
 
-import { createElement } from "../functions/createElement";
+import { TileInterface } from "../../types/globalInterfaces";
+import { createElement } from "../../functions/createElement";
 
 class Tile implements TileInterface {
 	isMerge?: boolean;
@@ -17,7 +18,8 @@ class Tile implements TileInterface {
 			id: number;
 			top: number;
 			left: number;
-		}
+		},
+		width: number
 	) {
 		this.isMerge = false
 		this.parent = parent
@@ -27,18 +29,21 @@ class Tile implements TileInterface {
 			top: options.top,
 			left: options.left,
 		};
-		this.init(parent);
+		this.init(parent, width);
 	}
 
-	private init(parent: HTMLDivElement) {
-		this.createTile(parent);
+	private init(parent: HTMLDivElement, width: number) {
+		this.createTile(parent, width);
 	}
 
-	private createTile(parent: HTMLDivElement) {
+	private createTile(parent: HTMLDivElement, width: number) {
 		const tile = createElement("div", `tile tile-${this.value}`) as HTMLDivElement;
 		tile.textContent = this.value.toString();
 		tile.style.left = this.position.left + "px";
 		tile.style.top = this.position.top + "px";
+		tile.style.width = `${width}px`;
+		tile.style.height = `${tile.style.width}`
+		tile.style.lineHeight = `${tile.style.height}`
 		parent.appendChild(tile);
 		this.tileElement = tile;
 	}

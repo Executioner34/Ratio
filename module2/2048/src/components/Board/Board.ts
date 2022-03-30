@@ -1,10 +1,12 @@
-import { BoardInterface } from '../types/globalInterfaces';
-import { createElement } from '../functions/createElement';
-import { getRandomPosition } from '../functions/getRandomPosition';
-import { getRandomValue } from '../functions/getRandomValue';
-import { createMatrix } from '../functions/createMatrix';
-import { Tile } from './Tile';
-import MakeObservableSubject from './Observer';
+import './board.css';
+
+import { BoardInterface } from '../../types/globalInterfaces';
+import { createElement } from '../../functions/createElement';
+import { getRandomPosition } from '../../functions/getRandomPosition';
+import { getRandomValue } from '../../functions/getRandomValue';
+import { createMatrix } from '../../functions/createMatrix';
+import { Tile } from '../Tile/Tile';
+import MakeObservableSubject from '../../functions/Observer';
 
 class Board implements BoardInterface {
 	size!: number;
@@ -16,11 +18,14 @@ class Board implements BoardInterface {
 	counterTiles: number;
 	total: number;
 	quantityTiles: number;
-	isEndGame: boolean
+	isEndGame: boolean;
+	startX!: number;
+	startY!: number;
+	tileWidthAndHeight!: number;
 
 	constructor(parent: HTMLDivElement, size: number, positionData: { top: number; left: number }[]) {
 		this.size = size;
-		this.counterTiles = 1;
+		this.counterTiles = 0;
 		this.positionData = positionData;
 		this.matrix = createMatrix(size);
 		this.total = 0;
@@ -35,6 +40,8 @@ class Board implements BoardInterface {
 		this.createRandomTile();
 		this.createRandomTile();
 		this.arrowMove = this.arrowMove.bind(this);
+		this.pointerDownHandler = this.pointerDownHandler.bind(this);
+		document.addEventListener('pointerdown', this.pointerDownHandler);
 		document.addEventListener('keydown', this.arrowMove);
 		this.updateScores();
 	}
@@ -43,7 +50,9 @@ class Board implements BoardInterface {
 		const board = createElement('div', 'board-container');
 		const grid = parent.querySelector('.grid');
 		board.style.width = `${grid?.clientWidth}px`;
+		const gridElem = grid?.querySelector('.grid-elem')!
 		parent.appendChild(board);
+		this.tileWidthAndHeight = gridElem.clientWidth
 		this.board = parent.querySelector('.board-container')!;
 	}
 
@@ -62,12 +71,14 @@ class Board implements BoardInterface {
 					id: this.counterTiles,
 					left: this.positionData[randomPositionInData].left,
 					top: this.positionData[randomPositionInData].top,
-				}),
+				}, this.tileWidthAndHeight),
 			};
 			this.counterTiles = this.counterTiles + 1;
-		} else if(this.quantityTiles === this.matrix.length) {
+			return;
+		} else if (this.quantityTiles === this.matrix.length * this.size) {
 			this.isEndGame = true;
-			this.subject.notify()
+			this.subject.notify();
+			return;
 		} else {
 			this.createRandomTile();
 		}
@@ -79,24 +90,75 @@ class Board implements BoardInterface {
 				e.preventDefault();
 				this.tilesMoveDown();
 				this.createRandomTile();
+				this.updateScores();
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
 				this.tilesMoveUp();
 				this.createRandomTile();
+				this.updateScores();
 				break;
 			case 'ArrowLeft':
 				e.preventDefault();
 				this.tilesMoveLeft();
 				this.createRandomTile();
+				this.updateScores();
 				break;
 			case 'ArrowRight':
 				e.preventDefault();
 				this.tilesMoveRight();
 				this.createRandomTile();
+				this.updateScores();
 				break;
 		}
-		this.updateScores();
+	}
+
+	private pointerDownHandler(event: PointerEvent) {
+		this.pointerMoveHandler = this.pointerMoveHandler.bind(this);
+		this.pointerUpHandler = this.pointerUpHandler.bind(this);
+		document.ondragstart = () => {
+			return false;
+		};
+		this.startX = event.pageX;
+		this.startY = event.pageY;
+
+		document.addEventListener('pointermove', this.pointerMoveHandler);
+		document.addEventListener('pointerup', this.pointerUpHandler);
+	}
+
+	private pointerMoveHandler(event: PointerEvent) {
+		const currentX = event.pageX;
+		const currentY = event.pageY;
+		const clientX = document.body.clientWidth;
+		const clientY = document.body.clientHeight;
+		const percentX = Math.floor(((this.startX - currentX) / clientX) * 100);
+		const percentY = Math.floor(((this.startY - currentY) / clientY) * 100);
+		if (percentX >= 10) {
+			this.tilesMoveLeft();
+			this.createRandomTile();
+			this.updateScores();
+			document.removeEventListener('pointermove', this.pointerMoveHandler);
+		} else if (percentX <= -10) {
+			this.tilesMoveRight();
+			this.createRandomTile();
+			this.updateScores();
+			document.removeEventListener('pointermove', this.pointerMoveHandler);
+		} else if (percentY >= 20) {
+			this.tilesMoveUp();
+			this.createRandomTile();
+			this.updateScores();
+			document.removeEventListener('pointermove', this.pointerMoveHandler);
+		} else if (percentY <= -20) {
+			this.tilesMoveDown();
+			this.createRandomTile();
+			this.updateScores();
+			document.removeEventListener('pointermove', this.pointerMoveHandler);
+		}
+	}
+
+	private pointerUpHandler() {
+		document.removeEventListener('pointermove', this.pointerMoveHandler);
+		document.removeEventListener('pointerup', this.pointerUpHandler);
 	}
 
 	private tilesMoveDown() {
@@ -124,7 +186,6 @@ class Board implements BoardInterface {
 			}
 		}
 		this.updateTiles();
-		console.log(this.matrix);
 	}
 
 	private tilesMoveUp() {
@@ -151,7 +212,6 @@ class Board implements BoardInterface {
 				}
 			}
 		}
-		console.log(this.matrix);
 		this.updateTiles();
 	}
 
@@ -179,14 +239,13 @@ class Board implements BoardInterface {
 				}
 			}
 		});
-		console.log(this.matrix);
 		this.updateTiles();
 	}
 
 	private tilesMoveRight() {
 		this.matrix.forEach((arr, index) => {
 			for (let j = 0; j <= arr.length - 1; j++) {
-				for (let i = arr.length - 1; i >= 1 ; i--) {
+				for (let i = arr.length - 1; i >= 1; i--) {
 					if (arr[i - 1] && arr[i] === undefined) {
 						let swap = arr[i - 1];
 						arr[i - 1] = arr[i];
@@ -208,7 +267,6 @@ class Board implements BoardInterface {
 			}
 		});
 		this.updateTiles();
-		console.log(this.matrix);
 	}
 
 	private updateTiles() {

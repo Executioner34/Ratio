@@ -1,10 +1,13 @@
 html {
   background-color: #faf8ef;
   color: #776e65;
+  font-size: 16px;
 }
 
 * {
+  touch-action: none;
   box-sizing: border-box;
+  user-select: none;
 }
 
 #app {
@@ -12,110 +15,16 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  width: 500px;
+  max-width: 500px;
   margin: 0 auto;
-  margin-top: 150px;
-  margin-bottom: 150px;
+  margin-top: 10%;
+  margin-bottom: 10%;
 }
 
-.game-container {
-  position: relative;
-}
-
-.grid-template {
-  width: 500px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, min-content);
-  gap: 10px;
-  background-color: #bbada0;
-  padding: 15px 15px;
-  margin: 0 auto;
-  z-index: 1;
-}
-
-.grid-elem {
-  width: 100%;
-  height: 70px;
-  border-radius: 3px;
-  background: rgba(238, 228, 218, 0.35);
-}
-
-.board-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-}
-
-.tile {
-  width: 86px;
-  height: 86px;
-  user-select: none;
-  text-align: center;
-  line-height: 86px;
-  font-size: 55px;
-  border-radius: 3px;
-  z-index: 2;
-  position: absolute;
-  transition-property: left, top, transform;
-  transition-duration: 250ms, 250ms, 100ms;
-  transform: scale(1);
-  animation-duration: 0.5s;
-  animation-name: createtile;
-}
-
-@keyframes createtile {
-  from {
-    opacity: 0;
-    transform: scale(1.2);
+@media screen and (max-width: 500px) {
+    #app {
+      max-width: 100%;
+      padding-right: 10px;
+      padding-left: 10px;
+    }
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.tile-2 {
-  background-color: #eee4da;
-}
-
-.tile-4 {
-  background-color: #eee1c9;
-}
-
-.tile-8 {
-  color: #f9f6f2;
-  background: #f3b27a;
-}
-
-.tile-16 {
-  color: #f9f6f2;
-  background: #f69664;
-}
-
-.tile-32 {
-  color: #f9f6f2;
-  background: #f77c5f;
-}
-
-.tile-64 {
-  font-size: 45px;
-  color: #f9f6f2;
-  background: #f75f3b;
-}
-
-.tile-128 {
-  font-size: 40px;
-  color: #f9f6f2;
-  background: #edd073;
-  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.238095), inset 0 0 0 1px rgba(255, 255, 255, 0.142857);
-}
-
-.tile-256 {
-  font-size: 40px;
-  color: #f9f6f2;
-  background: #edd073;
-  box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0.31746), inset 0 0 0 1px rgba(255, 255, 255, 0.190476);
-}
-

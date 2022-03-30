@@ -1,6 +1,8 @@
-import { GridInterface } from "../types/globalInterfaces";
-import { createElement } from "../functions/createElement";
-import { setPosition } from "../functions/setPosition";
+import './grid.css'
+
+import { GridInterface } from "../../types/globalInterfaces";
+import { createElement } from "../../functions/createElement";
+import { setPosition } from "../../functions/setPosition";
 
 class Grid implements GridInterface {
 	size: number;
@@ -35,6 +37,7 @@ class Grid implements GridInterface {
 		gridElem.forEach((elem) => {
 			elem.style.height = elem.clientWidth + "px";
 			this.gridElementPositionData.push(setPosition(elem));
+			console.log(elem.style.width)
 		});
 	}
 }

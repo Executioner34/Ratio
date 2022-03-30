@@ -10,7 +10,6 @@ export default class MakeObservableSubject {
 		if (isExist) {
 			return console.log('Subject: Наблюдатель уже прикреплен.');
 		}
-
 		this.observers.push(observer);
 	}
 
