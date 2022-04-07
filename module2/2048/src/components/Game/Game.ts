@@ -35,7 +35,7 @@ class Game implements GameInterface {
 		this.scores = this.Board.total;
 		this.Board.subject.addObserver(() => {
 			this.scores = this.Board.total;
-			this.isEndGame = this.Board.isEndGame;
+			this.isEndGame = this.Board.isLoseGame;
 			this.isStartGame = false;
 			if(this.Board.counterTiles === 3) {
 				this.isStartGame = true

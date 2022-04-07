@@ -37,7 +37,6 @@ class Grid implements GridInterface {
 		gridElem.forEach((elem) => {
 			elem.style.height = elem.clientWidth + "px";
 			this.gridElementPositionData.push(setPosition(elem));
-			console.log(elem.style.width)
 		});
 	}
 }

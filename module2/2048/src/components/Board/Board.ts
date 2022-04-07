@@ -18,7 +18,7 @@ class Board implements BoardInterface {
 	counterTiles: number;
 	total: number;
 	quantityTiles: number;
-	isEndGame: boolean;
+	isLoseGame: boolean;
 	startX!: number;
 	startY!: number;
 	tileWidthAndHeight!: number;
@@ -30,7 +30,7 @@ class Board implements BoardInterface {
 		this.matrix = createMatrix(size);
 		this.total = 0;
 		this.quantityTiles = 0;
-		this.isEndGame = false;
+		this.isLoseGame = false;
 		this.subject = new MakeObservableSubject();
 		this.init(parent);
 	}
@@ -75,14 +75,14 @@ class Board implements BoardInterface {
 			};
 			this.counterTiles = this.counterTiles + 1;
 			return;
-		} else if (this.quantityTiles === this.matrix.length * this.size) {
-			this.isEndGame = true;
-			this.subject.notify();
-			return;
+		} else if(this.quantityTiles === 25) {
+			return
 		} else {
 			this.createRandomTile();
 		}
 	}
+
+	
 
 	private arrowMove(e: KeyboardEvent) {
 		switch (e.code) {
@@ -292,7 +292,32 @@ class Board implements BoardInterface {
 		});
 		this.total = sum;
 		this.quantityTiles = counter;
+		if(this.quantityTiles === 25) {
+			this.isLoseGame = this.checkLoseGame()
+			this.subject.notify()
+		}
 		this.subject.notify();
+	}
+
+	private checkLoseGame() {
+		let arr = this.matrix.flat()
+		return arr.map(tile => {
+			return tile?.value
+		}).every((value, index, array) => {
+			if (value && array[index + 1]) {
+				return value !== array[index + 1]
+			} 
+			if(value && array[index - 1]) {
+				return value !== array[index - 1]
+			} 
+			if(value && array[index + 5]) {
+				return value !== array[index + 5]
+			} 
+			if(value && array[index - 5]) {
+				return value !== array[index - 5]
+			}
+		})
+
 	}
 }
 
