@@ -41,7 +41,7 @@ class Board implements BoardInterface {
 		this.createRandomTile();
 		this.arrowMove = this.arrowMove.bind(this);
 		this.pointerDownHandler = this.pointerDownHandler.bind(this);
-		document.addEventListener('pointerdown', this.pointerDownHandler);
+		parent.addEventListener('pointerdown', this.pointerDownHandler);
 		document.addEventListener('keydown', this.arrowMove);
 		this.updateScores();
 	}
