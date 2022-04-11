@@ -1,0 +1,41 @@
+.table-container {
+	display: flex;
+	flex-direction: column;
+	margin-top: 20px;
+}
+
+.table__header {
+	display: flex;
+	justify-content: space-around;
+}
+
+h2.header__time,
+h2.header__name {
+	font-size: 2rem;
+	font-weight: bold;
+	margin-bottom: 30px;
+}
+
+.table__list {
+	display: flex;
+	flex-direction: column;
+}
+
+.list__item {
+	display: flex;
+	justify-content: space-around;
+	line-height: 30px;
+	background-color: rgba(238, 228, 218, 0.35);
+	border: 1px #bbada0 solid;
+	border-top: none;
+}
+
+.list__item:nth-child(1) {
+	border-top: 1px #bbada0 solid;
+}
+
+.item__time,
+.item__name {
+	width: 50%;
+	font-size: 1.125rem;
+}

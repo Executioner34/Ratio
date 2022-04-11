@@ -3,7 +3,8 @@ import './style.css';
 
 import { Game } from './components/Game/Game';
 import { Header } from './components/Header/Header';
-import { renderTime } from './functions/timer';
+import { HighScoreTable } from './components/HighScoreTable/HighScoreTable';
+import { renderTime } from './functions/renderTime';
 
 class App {
 	root: HTMLDivElement;
@@ -13,6 +14,7 @@ class App {
 	Game!: Game;
 	Header!: Header;
 	timer!: number;
+	HighScoreTable!: HighScoreTable;
 
 	constructor(size: number) {
 		this.root = document.querySelector('#app')!;
@@ -36,11 +38,13 @@ class App {
 			}
 		})
 		this.Header = new Header(this.root, this.Game.scores);
+		this.HighScoreTable = new HighScoreTable(this.root)
 	}
 
 	private updateTimer() {
 		this.Header.updateTimerContainer(renderTime(this.nowDate))
 	}
+	
 	private startTimer() {
 		this.nowDate = Date.now()
 		this.timer = setInterval(() => {
