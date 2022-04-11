@@ -9,8 +9,8 @@ import { renderTime } from './functions/renderTime';
 class App {
 	root: HTMLDivElement;
 	size!: number;
-	scores!: number
-	nowDate!: number
+	scores!: number;
+	nowDate!: number;
 	Game!: Game;
 	Header!: Header;
 	timer!: number;
@@ -27,29 +27,28 @@ class App {
 			size: size,
 		});
 		this.Game.Observer.addObserver(() => {
-			this.scores = this.Game.scores
-			this.Header.updateScoreContainer(this.Game.scores)
+			this.scores = this.Game.scores;
+			this.Header.updateScoreContainer(this.Game.scores);
 			if (this.Game.isEndGame) {
-				console.log(this.Game.isEndGame)
-				clearInterval(this.timer)
+				clearInterval(this.timer);
 			}
 			if (this.Game.isStartGame) {
-				this.startTimer()
+				this.startTimer();
 			}
-		})
+		});
 		this.Header = new Header(this.root, this.Game.scores);
-		this.HighScoreTable = new HighScoreTable(this.root)
+		this.HighScoreTable = new HighScoreTable(this.root);
 	}
 
 	private updateTimer() {
-		this.Header.updateTimerContainer(renderTime(this.nowDate))
+		this.Header.updateTimerContainer(renderTime(this.nowDate));
 	}
-	
+
 	private startTimer() {
-		this.nowDate = Date.now()
+		this.nowDate = Date.now();
 		this.timer = setInterval(() => {
-			this.updateTimer()
-		}, 1000)
+			this.updateTimer();
+		}, 1000);
 	}
 }
 

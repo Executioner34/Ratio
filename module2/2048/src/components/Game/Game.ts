@@ -13,6 +13,7 @@ class Game implements GameInterface {
 	scores: number;
 	isStartGame: boolean;
 	isEndGame: boolean;
+	isWinGame: boolean;
 	options!: GameOptions;
 	Grid!: Grid;
 	Board!: Board;
@@ -22,8 +23,9 @@ class Game implements GameInterface {
 		this.root = options.root;
 		this.size = options.size || 5;
 		this.scores = 0;
-		this.isStartGame = false
+		this.isStartGame = false;
 		this.isEndGame = false;
+		this.isWinGame = false;
 		this.Observer = new MakeObservableSubject();
 		this.init();
 	}
@@ -35,10 +37,11 @@ class Game implements GameInterface {
 		this.scores = this.Board.total;
 		this.Board.subject.addObserver(() => {
 			this.scores = this.Board.total;
-			this.isEndGame = this.Board.isLoseGame;
+			this.isEndGame = this.Board.isLoseGame || this.Board.isWinGame;
+			this.isWinGame = this.Board.isWinGame;
 			this.isStartGame = false;
-			if(this.Board.counterTiles === 3) {
-				this.isStartGame = true
+			if (this.Board.counterTiles === 3) {
+				this.isStartGame = true;
 			}
 			this.Observer.notify();
 		});

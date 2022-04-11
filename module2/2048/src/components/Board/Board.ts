@@ -19,6 +19,7 @@ class Board implements BoardInterface {
 	total: number;
 	quantityTiles: number;
 	isLoseGame: boolean;
+	isWinGame: boolean;
 	startX!: number;
 	startY!: number;
 	tileWidthAndHeight!: number;
@@ -31,6 +32,7 @@ class Board implements BoardInterface {
 		this.total = 0;
 		this.quantityTiles = 0;
 		this.isLoseGame = false;
+		this.isWinGame = false;
 		this.subject = new MakeObservableSubject();
 		this.init(parent);
 	}
@@ -50,9 +52,9 @@ class Board implements BoardInterface {
 		const board = createElement('div', 'board-container');
 		const grid = parent.querySelector('.grid');
 		board.style.width = `${grid?.clientWidth}px`;
-		const gridElem = grid?.querySelector('.grid-elem')!
+		const gridElem = grid?.querySelector('.grid-elem')!;
 		parent.appendChild(board);
-		this.tileWidthAndHeight = gridElem.clientWidth
+		this.tileWidthAndHeight = gridElem.clientWidth;
 		this.board = parent.querySelector('.board-container')!;
 	}
 
@@ -66,23 +68,25 @@ class Board implements BoardInterface {
 				id: this.counterTiles,
 				value: randomValue,
 				...this.positionData[randomPositionInData],
-				tileElem: new Tile(this.board, {
-					value: randomValue,
-					id: this.counterTiles,
-					left: this.positionData[randomPositionInData].left,
-					top: this.positionData[randomPositionInData].top,
-				}, this.tileWidthAndHeight),
+				tileElem: new Tile(
+					this.board,
+					{
+						value: randomValue,
+						id: this.counterTiles,
+						left: this.positionData[randomPositionInData].left,
+						top: this.positionData[randomPositionInData].top,
+					},
+					this.tileWidthAndHeight
+				),
 			};
 			this.counterTiles = this.counterTiles + 1;
 			return;
-		} else if(this.quantityTiles === 25) {
-			return
+		} else if (this.quantityTiles === 25 || this.checkWinGame()) {
+			return;
 		} else {
 			this.createRandomTile();
 		}
 	}
-
-	
 
 	private arrowMove(e: KeyboardEvent) {
 		switch (e.code) {
@@ -292,32 +296,39 @@ class Board implements BoardInterface {
 		});
 		this.total = sum;
 		this.quantityTiles = counter;
-		if(this.quantityTiles === 25) {
-			this.isLoseGame = this.checkLoseGame()
-			this.subject.notify()
+		this.isWinGame = this.checkWinGame();
+		if (this.quantityTiles === 25) {
+			this.isLoseGame = this.checkLoseGame();
+			this.subject.notify();
 		}
 		this.subject.notify();
 	}
 
 	private checkLoseGame() {
-		let arr = this.matrix.flat()
-		return arr.map(tile => {
-			return tile?.value
-		}).every((value, index, array) => {
-			if (value && array[index + 1]) {
-				return value !== array[index + 1]
-			} 
-			if(value && array[index - 1]) {
-				return value !== array[index - 1]
-			} 
-			if(value && array[index + 5]) {
-				return value !== array[index + 5]
-			} 
-			if(value && array[index - 5]) {
-				return value !== array[index - 5]
-			}
-		})
+		let arr = this.matrix.flat();
+		return arr
+			.map((tile) => {
+				return tile?.value;
+			})
+			.every((value, index, array) => {
+				if (value && array[index + 1]) {
+					return value !== array[index + 1];
+				}
+				if (value && array[index - 1]) {
+					return value !== array[index - 1];
+				}
+				if (value && array[index + 5]) {
+					return value !== array[index + 5];
+				}
+				if (value && array[index - 5]) {
+					return value !== array[index - 5];
+				}
+			});
+	}
 
+	private checkWinGame() {
+		let arr = this.matrix.flat();
+		return arr.some((tile) => tile?.value === 2048);
 	}
 }
 
