@@ -5,4 +5,7 @@ export default {
 	plugins: [
 		StimulusHMR(),
 	],
+	server: {
+		port: 3000,
+	}
 };

@@ -11,7 +11,6 @@ class Game implements GameInterface {
 	root: HTMLDivElement;
 	size!: number;
 	scores: number;
-	isStartGame: boolean;
 	isEndGame: boolean;
 	isWinGame: boolean;
 	options!: GameOptions;
@@ -23,7 +22,6 @@ class Game implements GameInterface {
 		this.root = options.root;
 		this.size = options.size || 5;
 		this.scores = 0;
-		this.isStartGame = false;
 		this.isEndGame = false;
 		this.isWinGame = false;
 		this.Observer = new MakeObservableSubject();
@@ -39,10 +37,6 @@ class Game implements GameInterface {
 			this.scores = this.Board.total;
 			this.isEndGame = this.Board.isLoseGame || this.Board.isWinGame;
 			this.isWinGame = this.Board.isWinGame;
-			this.isStartGame = false;
-			if (this.Board.counterTiles === 3) {
-				this.isStartGame = true;
-			}
 			this.Observer.notify();
 		});
 	}
